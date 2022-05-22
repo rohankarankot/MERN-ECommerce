@@ -2,6 +2,19 @@ const ErrorHandler = require("../utils/errorHandler");
 module.exports = (err, req, res, next) => {
   err.status = err.status || 500;
   err.message = err.message || "Something went wrong";
+
+  //wronge Mongo ID
+  err.message.split(" ").map((m) => {
+    if (m.startsWith("Cast")) {
+      err.message = `Resource not Found, Invalid "${err.path}", CastError`;
+      res.status(err.status).json({
+        status: 400,
+        message: err.message,
+      });
+      return;
+    }
+  });
+
   res.status(err.status).json({
     success: false,
     error: err.status,
