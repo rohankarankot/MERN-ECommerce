@@ -11,3 +11,7 @@ Developing Fully Functional MERN Stack E Commerce Website with admin dashboard
 
 **DataBase:** MongoDB
 
+
+## 🛠 Skills
+Javascript, React, Node, Express, MongoDB, HTML, CSS...
+
