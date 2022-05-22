@@ -21,13 +21,11 @@ exports.getAllProducts = async (req, res) => {
 
 //update Product --ADMIN
 exports.updateProduct = async (req, res, next) => {
-  if (!(await Product.findById(req.params.id, req.body))) {
-    return res.status(404).json({
-      success: false,
-      message: "Product not found",
-    });
+  let product = await Product.findById(req.params.id.trim());
+  if (!product) {
+    return next(new ErrorHandler("Product not found", 404));
   }
-  const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+  product = await Product.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
@@ -40,11 +38,9 @@ exports.updateProduct = async (req, res, next) => {
 
 //delete Product --ADMIN
 exports.deleteProduct = async (req, res, next) => {
-  if (!(await Product.findById(req.params.id))) {
-    return res.status(404).json({
-      success: false,
-      message: "Product not found",
-    });
+  let product = await Product.findById(req.params.id.trim());
+  if (!product) {
+    return next(new ErrorHandler("Product not found", 404));
   }
   await Product.findByIdAndDelete(req.params.id);
   res.status(200).json({
@@ -55,13 +51,13 @@ exports.deleteProduct = async (req, res, next) => {
 
 //get Product by id --PUBLIC
 exports.getProductDetails = async (req, res, next) => {
-  try {
-    const product = await Product.findById(req.params.id.trim());
-    res.status(200).json({
-      success: true,
-      product,
-    });
-  } catch (error) {
-    next(new ErrorHandler("Product not Found", 500));
+  let product = await Product.findById(req.params.id.trim());
+  if (!product) {
+    return next(new ErrorHandler("Product not found", 404));
   }
+  product = await Product.findById(req.params.id.trim());
+  res.status(200).json({
+    success: true,
+    product,
+  });
 };

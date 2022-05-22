@@ -1,10 +1,11 @@
 const ErrorHandler = require("../utils/errorHandler");
 module.exports = (err, req, res, next) => {
-  err.statusCode = err.statusCode || 500;
+  err.status = err.status || 500;
   err.message = err.message || "Something went wrong";
-  res.status(err.statusCode).json({
+  res.status(err.status).json({
     success: false,
-    error: err,
+    error: err.status,
     message: err.message,
+    errorAt: err.stack,
   });
 };
