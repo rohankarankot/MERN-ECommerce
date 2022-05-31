@@ -6,7 +6,7 @@ module.exports = (err, req, res, next) => {
   //wronge Mongo ID
   err.message.split(" ").map((m) => {
     if (m.startsWith("Cast")) {
-      err.message = `Resource not Found, Invalid "${err.path}", CastError`;
+      err.message = `(CastError) Resource not Found, Invalid ${err.path}`;
       res.status(err.status).json({
         status: 400,
         message: err.message,
