@@ -3,6 +3,7 @@ const catchAsyncErorrs = require("../middleware/catchAsyncErrors");
 const userModel = require("../models/userModel");
 const ErrorHandler = require("../utils/errorHandler");
 const sendToken = require("../utils/jwtToken");
+const sendEmail = require("../utils/sendEmail");
 
 // register user
 exports.registerUser = catchAsyncErorrs(async (req, res, next) => {
@@ -44,4 +45,39 @@ exports.logoutUser = catchAsyncErorrs(async (req, res, next) => {
     status: "success",
     message: "Logged out successfully",
   });
+});
+
+// forgot password
+exports.forgotPassword = catchAsyncErorrs(async (req, res, next) => {
+  const { email } = req.body;
+  if (!email) {
+    return next(new ErrorHandler("Please provide email", 400));
+  }
+  const user = await userModel.findOne({ email });
+  if (!user) {
+    return next(new ErrorHandler("No user found with this email", 404));
+  }
+  const resetToken = user.getResetPasswordToken();
+  await user.save({ validateBeforeSave: false });
+  const resetUrl = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/password/reset/${resetToken}`;
+  const message = `You are receiving this email because you (or someone else) has requested the reset of a password. \n\n ${resetUrl} \n\n If you did not request this, please ignore this email and your password will remain unchanged.`;
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Password reset link",
+      message,
+    });
+    res.status(200).json({
+      status: "success",
+      message: `password reset link sent to ${user.email}`,
+    });
+  } catch (error) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save({ validateBeforeSave: false });
+    return next(new ErrorHandler("Something went wrong", 500));
+  }
 });
