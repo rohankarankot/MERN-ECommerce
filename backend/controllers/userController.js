@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const catchAsyncErorrs = require("../middleware/catchAsyncErrors");
-const userModel = require("../models/userModel");
+const User = require("../models/userModel");
 const ErrorHandler = require("../utils/errorHandler");
 const sendToken = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
@@ -8,7 +8,7 @@ const sendEmail = require("../utils/sendEmail");
 // register user
 exports.registerUser = catchAsyncErorrs(async (req, res, next) => {
   const { name, email, password } = req.body;
-  const user = await userModel.create({
+  const user = await User.create({
     name,
     email,
     password,
@@ -27,7 +27,7 @@ exports.loginUser = catchAsyncErorrs(async (req, res, next) => {
   if (!email || !password) {
     return next(new ErrorHandler("Please provide email and password", 400));
   }
-  const user = await userModel.findOne({ email }).select("+password");
+  const user = await User.findOne({ email }).select("+password");
   if (!user || !(await user.comparePassword(password))) {
     return next(new ErrorHandler("Incorrect email or password", 401));
   }
@@ -53,11 +53,11 @@ exports.forgotPassword = catchAsyncErorrs(async (req, res, next) => {
   if (!email) {
     return next(new ErrorHandler("Please provide email", 400));
   }
-  const user = await userModel.findOne({ email });
+  const user = await User.findOne({ email });
   if (!user) {
     return next(new ErrorHandler("No user found with this email", 404));
   }
-  const resetToken = user.createPasswordResetToken();
+  const resetToken = User.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
   const resetUrl = `${req.protocol}://${req.get(
     "host"
@@ -80,4 +80,17 @@ exports.forgotPassword = catchAsyncErorrs(async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
     return next(new ErrorHandler(error, 500));
   }
+});
+
+//get user details
+exports.getUserDetails = catchAsyncErorrs(async (req, res, next) => {
+  console.log(req.user.id);
+  const user = await User.findById(req.user.id)
+    .select("-password")
+    .select("-_id")
+    .select("-__v");
+  res.status(200).json({
+    status: "success",
+    user,
+  });
 });
