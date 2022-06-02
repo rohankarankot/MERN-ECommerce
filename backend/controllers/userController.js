@@ -57,7 +57,7 @@ exports.forgotPassword = catchAsyncErorrs(async (req, res, next) => {
   if (!user) {
     return next(new ErrorHandler("No user found with this email", 404));
   }
-  const resetToken = user.getResetPasswordToken();
+  const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
   const resetUrl = `${req.protocol}://${req.get(
     "host"
@@ -78,6 +78,6 @@ exports.forgotPassword = catchAsyncErorrs(async (req, res, next) => {
     user.passwordResetExpires = undefined;
 
     await user.save({ validateBeforeSave: false });
-    return next(new ErrorHandler("Something went wrong", 500));
+    return next(new ErrorHandler(error, 500));
   }
 });
