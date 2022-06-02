@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const catchAsyncErorrs = require("../middleware/catchAsyncErrors");
 const userModel = require("../models/userModel");
 const ErrorHandler = require("../utils/errorHandler");
+const sendToken = require("../utils/jwtToken");
 
 // register user
 exports.registerUser = catchAsyncErorrs(async (req, res, next) => {
@@ -16,23 +17,19 @@ exports.registerUser = catchAsyncErorrs(async (req, res, next) => {
     },
   });
   const token = user.getSignedJwtToken();
-  res.status(201).json({
-    success: true,
-    token,
-  });
+  sendToken(user, 201, res);
 });
 
 //Login user
 exports.loginUser = catchAsyncErorrs(async (req, res, next) => {
   const { email, password } = req.body;
+  if (!email || !password) {
+    return next(new ErrorHandler("Please provide email and password", 400));
+  }
   const user = await userModel.findOne({ email }).select("+password");
   if (!user || !(await user.comparePassword(password))) {
     return next(new ErrorHandler("Incorrect email or password", 401));
   }
   const token = user.getSignedJwtToken();
-  res.status(200).json({
-    message: "Login Successful",
-    success: true,
-    token,
-  });
+  sendToken(user, 200, res);
 });
