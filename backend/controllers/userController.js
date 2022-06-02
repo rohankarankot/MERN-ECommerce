@@ -33,3 +33,15 @@ exports.loginUser = catchAsyncErorrs(async (req, res, next) => {
   const token = user.getSignedJwtToken();
   sendToken(user, 200, res);
 });
+
+//Logout user
+exports.logoutUser = catchAsyncErorrs(async (req, res, next) => {
+  res.cookie("token", null, {
+    expires: new Date(Date.now()),
+    httpOnly: true,
+  });
+  res.status(200).json({
+    status: "success",
+    message: "Logged out successfully",
+  });
+});

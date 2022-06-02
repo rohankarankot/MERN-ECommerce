@@ -19,6 +19,6 @@ module.exports = (err, req, res, next) => {
     success: false,
     error: err.status,
     message: err.message,
-    errorAt: err.stack,
+    // errorAt: err.stack,
   });
 };
