@@ -7,8 +7,10 @@ const {
   getUserDetails,
   changePassword,
   updateUserDetails,
+  getAllUsers,
+  getSingleUser,
 } = require("../controllers/userController");
-const { isAuthenticatedUser } = require("../middleware/auth");
+const { isAuthenticatedUser, authorizedRoles } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -19,4 +21,11 @@ router.route("/me").get(isAuthenticatedUser, getUserDetails);
 router.route("/password/forgot").post(forgotPassword);
 router.route("/password/update").put(isAuthenticatedUser, changePassword);
 router.route("/me/update").put(isAuthenticatedUser, updateUserDetails);
+router
+  .route("/admin/users")
+  .get(isAuthenticatedUser, authorizedRoles("admin"), getAllUsers);
+router
+  .route("/admin/user/:id")
+  .get(isAuthenticatedUser, authorizedRoles("admin"), getSingleUser);
+router;
 module.exports = router;

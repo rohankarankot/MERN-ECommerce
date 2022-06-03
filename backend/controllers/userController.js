@@ -131,3 +131,28 @@ exports.updateUserDetails = catchAsyncErorrs(async (req, res, next) => {
     message: "user details updated successfully",
   });
 });
+
+//get all users -- admin only
+exports.getAllUsers = catchAsyncErorrs(async (req, res, next) => {
+  const users = await User.find({}).select("-password").select("-__v");
+  res.status(200).json({
+    status: "success",
+    users,
+  });
+});
+
+// get single user -- admin only
+exports.getSingleUser = catchAsyncErorrs(async (req, res, next) => {
+  const user = await User.findById(req.params.id)
+    .select("-password")
+    .select("-_id")
+    .select("-__v");
+  if (!user) {
+    return next(new ErrorHandler("No user found with this id", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    user,
+  });
+});
