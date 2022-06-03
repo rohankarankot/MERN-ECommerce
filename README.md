@@ -3,6 +3,18 @@
 
 Developing Fully Functional MERN Stack E Commerce Website with admin dashboard 
 
+## Under development 🛠 
+
+- Backend
+
+## Features
+
+- mobile first
+- product search
+- filtering products
+- and many more...
+
+
 ## Tech Stack
 
 **Client:** React, Redux, Material UI
