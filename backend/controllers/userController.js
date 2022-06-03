@@ -94,3 +94,21 @@ exports.getUserDetails = catchAsyncErorrs(async (req, res, next) => {
     user,
   });
 });
+
+//change password
+exports.changePassword = catchAsyncErorrs(async (req, res, next) => {
+  const { password, newPassword } = req.body;
+  if (!password || !newPassword) {
+    return next(
+      new ErrorHandler("Please provide password and new password", 400)
+    );
+  }
+
+  const user = await User.findById(req.user.id).select("+password");
+  if (!(await user.comparePassword(password))) {
+    return next(new ErrorHandler("old password is Incorrect", 401));
+  }
+  user.password = newPassword;
+  await user.save();
+  sendToken(user, 200, res);
+});
