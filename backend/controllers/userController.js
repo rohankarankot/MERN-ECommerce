@@ -156,3 +156,36 @@ exports.getSingleUser = catchAsyncErorrs(async (req, res, next) => {
     user,
   });
 });
+
+// update user role --admin only
+exports.updateUserRole = catchAsyncErorrs(async (req, res, next) => {
+  const newData = {
+    name: req.body.name,
+    email: req.body.email,
+    role: req.body.role,
+  };
+  await User.findByIdAndUpdate(req.params.id, newData, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+
+  res.status(200).json({
+    status: "success",
+    message: `user role updated to ${newData.role} successfully`,
+  });
+});
+
+// delete user details -- admin only
+exports.deleteUser = catchAsyncErorrs(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) return next(new ErrorHandler("No user found", 404));
+  await user.remove();
+
+  //todo: delete avatar
+  res.status(200).json({
+    status: "success",
+    message: "user Deleted successfully",
+  });
+});
