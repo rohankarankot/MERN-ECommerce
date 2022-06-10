@@ -11,6 +11,8 @@ Developing Fully Functional MERN Stack E Commerce Website with admin dashboard
 
 - mobile first
 - product search
+- product rating
+- product review
 - filtering products
 - and many more...
 
