@@ -8,7 +8,11 @@ app.use(cookieParser());
 //route imports
 const productRoutes = require("./routes/productRoute");
 const userRoutes = require("./routes/userRoute");
-
+app.get('/', (req, res) =>
+    res.status(200).json({
+        success: true,
+        message: "route successfull!!!"
+    }))
 app.use("/api/v1", productRoutes);
 app.use("/api/v1", userRoutes);
 
